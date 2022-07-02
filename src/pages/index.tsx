@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 
 const Home: NextPage = () => {
   const [pokemonIDs, setPokemonIDs] = useState<number[]>([]);
+  // const [firstPokemon, setFirstPokemon] = useState({});
+  // const [secondPokemon, setSecondPokemon] = useState({});
 
   useEffect(() => {
     const [first, second] = getOptionsForVote();
@@ -16,13 +18,27 @@ const Home: NextPage = () => {
     "get-pokemon-by-id",
     { id: pokemonIDs[0] },
   ]);
+
   const secondPokemon = trpc.useQuery([
     "get-pokemon-by-id",
     { id: pokemonIDs[1] },
   ]);
 
+  const voteMutation = trpc.useMutation(["cast-vote"]);
+
   const voteForRoundest = (selected: number) => {
-    // todo: fire mutation to persist changes
+    if (selected === pokemonIDs[0]) {
+      voteMutation.mutate({
+        votedFor: pokemonIDs[0],
+        votedAgainst: pokemonIDs[1],
+      });
+    } else {
+      voteMutation.mutate({
+        votedFor: pokemonIDs[1],
+        votedAgainst: pokemonIDs[0],
+      });
+    }
+
     setPokemonIDs(getOptionsForVote());
   };
 
@@ -56,15 +72,15 @@ type PokemonFromServer = inferQueryResponse<"get-pokemon-by-id">;
 
 const PokemonListing: React.FC<{
   pokemon: PokemonFromServer;
-  vote: (number: number) => void;
+  vote: () => void;
 }> = (props) => {
   const btnClass =
     "inline-flex items-center px-2.5 py=1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500";
 
   return (
-    <div className="w-64 h-64 flex flex-col items-center">
+    <div className="flex flex-col items-center">
       <img
-        className="w-full"
+        className="w-64 h-64"
         src={props.pokemon.sprites.front_default as string}
         alt=""
       />
@@ -73,7 +89,7 @@ const PokemonListing: React.FC<{
       </p>
       <button
         onClick={() => {
-          props.vote(1);
+          props.vote();
         }}
         className={btnClass}
       >
