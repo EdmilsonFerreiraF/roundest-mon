@@ -1,6 +1,7 @@
 import { getOptionsForVote } from "@/utils/getRandomPokemon";
 import { inferQueryResponse, trpc } from "@/utils/trpc";
 import type { NextPage } from "next";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const Home: NextPage = () => {
@@ -64,6 +65,9 @@ const Home: NextPage = () => {
             </>
           )}
       </div>
+      <div className="absolute bottom-0 w-full text-xl text-center pb-2">
+        <a href="https://github.com/EdmilsonFerreiraF/roundest-mon">Github</a>
+      </div>
     </div>
   );
 };
@@ -79,9 +83,11 @@ const PokemonListing: React.FC<{
 
   return (
     <div className="flex flex-col items-center">
-      <img
+      <Image
         className="w-64 h-64"
         src={props.pokemon.sprites.front_default as string}
+        width={256}
+        height={256}
         alt=""
       />
       <p className="text-xl text-center capitalize mt-[-2rem]">
